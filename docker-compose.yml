@@ -12,7 +12,7 @@ services:
       ## CONFIGURACIÓN S3 PARA MINIO
       AWS_REGION: us-east-1
       S3_ENDPOINT: http://sparkrise-minio-snhypj-minio-1:9000
-      S3_BUCKET: resultados
+      S3_BUCKET: resultados-laboratorio
       AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
       AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
 

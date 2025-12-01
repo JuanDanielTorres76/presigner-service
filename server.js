@@ -13,6 +13,9 @@ const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
 const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 
 // Configurar cliente S3 para MinIO
+process.env.AWS_EC2_METADATA_DISABLED = 'true';
+process.env.AWS_SDK_LOAD_CONFIG = 'false';
+
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3({
   endpoint: 'http://minio:9000',
