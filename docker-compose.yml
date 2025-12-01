@@ -9,13 +9,11 @@ services:
     environment:
       PORT: 4000
 
-      # CONFIGURACIÓN S3 PARA MINIO
       AWS_REGION: us-east-1
       S3_ENDPOINT: https://minio.sparkrise.com.co
       S3_BUCKET: resultados-laboratorio
       AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
       AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
-
       AWS_EC2_METADATA_DISABLED: "true"
 
     networks:
@@ -25,11 +23,12 @@ services:
       - "4000:4000"
 
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.presigner-router.rule=Host(`presigner.sparkrise.com.co`)
-      - traefik.http.routers.presigner-router.entrypoints=websecure
-      - traefik.http.routers.presigner-router.tls.certresolver=letsencrypt
-      - traefik.http.services.presigner-service.loadbalancer.server.port=4000
+      - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
+      - "traefik.http.routers.presigner-router.rule=Host(`presigner.sparkrise.com.co`)"
+      - "traefik.http.routers.presigner-router.entrypoints=websecure"
+      - "traefik.http.routers.presigner-router.tls.certresolver=letsencrypt"
+      - "traefik.http.services.presigner.loadbalancer.server.port=4000"
 
 networks:
   dokploy-network:
