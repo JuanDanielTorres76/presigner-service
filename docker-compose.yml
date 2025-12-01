@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  presigner:
+    build: .
+    restart: unless-stopped
+    environment:
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    networks:
+      - dokploy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.presigner.rule=Host(`presigner.sparkrise.com.co`)
+      - traefik.http.routers.presigner.entrypoints=websecure
+      - traefik.http.routers.presigner.tls.certresolver=letsencrypt
+      - traefik.http.services.presigner.loadbalancer.server.port=4000
+
+networks:
+  dokploy:
+    external: true
