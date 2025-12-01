@@ -1,67 +1,51 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import {
-  S3Client,
-  GetObjectCommand
-} from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-
-dotenv.config();
+const express = require('express');
+const crypto = require('crypto');
+const AWS = require('aws-sdk');
 
 const app = express();
 app.use(express.json());
-app.use(cors());
 
-const s3 = new S3Client({
-  region: "us-east-1",
-  endpoint: process.env.MINIO_ENDPOINT,
-  credentials: {
-    accessKeyId: process.env.MINIO_ACCESS_KEY,
-    secretAccessKey: process.env.MINIO_SECRET_KEY
-  },
-  forcePathStyle: true
+const port = process.env.PORT || 4000;
+
+const region = process.env.AWS_REGION;
+const bucket = process.env.S3_BUCKET;
+const endpoint = process.env.S3_ENDPOINT;
+const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+
+const s3 = new AWS.S3({
+  endpoint,
+  accessKeyId,
+  secretAccessKey,
+  region,
+  s3ForcePathStyle: true,
+  signatureVersion: 'v4',
+  sslEnabled: false,
 });
 
-app.post("/presign", async (req, res) => {
+app.get('/presign', async (req, res) => {
   try {
-    const { bucket, key, expiresIn } = req.body;
+    const { key } = req.query;
 
-    if (!bucket || !key) {
-      return res.status(400).json({
-        error: "bucket and key are required"
-      });
+    if (!key) {
+      return res.status(400).json({ error: 'Missing key parameter' });
     }
 
-    const command = new GetObjectCommand({
+    const params = {
       Bucket: bucket,
-      Key: key
-    });
+      Key: key,
+      Expires: 600, // 10 min
+    };
 
-    const signedUrl = await getSignedUrl(s3, command, {
-      expiresIn: expiresIn || 3600 // 1 hour
-    });
+    const url = await s3.getSignedUrlPromise('getObject', params);
 
-    return res.json({
-      url: signedUrl,
-      expiresIn: expiresIn || 3600
-    });
-
+    res.json({ url });
   } catch (error) {
-    console.error("Error generating pre-signed URL:", error);
-    return res.status(500).json({
-      error: "Failed to generate presigned URL",
-      details: error.message
-    });
+    console.error('Error generating presigned URL:', error);
+    res.status(500).json({ error: 'Failed to generate presigned URL' });
   }
 });
 
-app.get("/", (req, res) => {
-  res.json({
-    message: "Presigner service is running"
-  });
-});
-
-app.listen(4000, () => {
-  console.log("Presigner service running on port 4000");
+app.listen(port, () => {
+  console.log(`Presigner service running on port ${port}`);
 });
