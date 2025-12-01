@@ -25,7 +25,7 @@ const s3 = new AWS.S3({
   secretAccessKey,
   s3ForcePathStyle: true,
   signatureVersion: "v4",
-  sslEnabled: false
+  sslEnabled: true
 });
 
 app.get("/presign", async (req, res) => {
