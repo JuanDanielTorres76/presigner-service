@@ -23,16 +23,17 @@ services:
 
     labels:
       - traefik.enable=true
-      - traefik.docker.network=dokploy-network
-
-      # 🔥 Router principal
+      - traefik.http.routers.000-presigner.priority=9999
       - traefik.http.routers.000-presigner.rule=Host(`presigner.sparkrise.com.co`)
       - traefik.http.routers.000-presigner.entrypoints=websecure
       - traefik.http.routers.000-presigner.tls.certresolver=letsencrypt
-      - traefik.http.routers.000-presigner.priority=9999   # 💥 PRIORIDAD MÁXIMA
-
-      # 🔥 Servicio que apunta al contenedor
       - traefik.http.services.000-presigner-service.loadbalancer.server.port=4000
+
+      # 🔥 BLOQUEA routers generados automáticos
+      - traefik.http.routers.sparkrise-presigner-u91a4u-19-web.tls=false
+      - traefik.http.routers.sparkrise-presigner-u91a4u-19-websecure.tls=false
+      - traefik.http.routers.sparkrise-presigner-u91a4u-19-web.priority=1
+      - traefik.http.routers.sparkrise-presigner-u91a4u-19-websecure.priority=1
 
 networks:
   dokploy-network:
