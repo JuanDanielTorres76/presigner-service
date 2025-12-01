@@ -24,15 +24,16 @@ services:
     labels:
       - traefik.enable=true
 
-      # 🚀 TU ROUTER CORRECTO
-      - traefik.http.routers.presigner-router.rule=Host(`presigner.sparkrise.com.co`)
-      - traefik.http.routers.presigner-router.entrypoints=websecure
-      - traefik.http.routers.presigner-router.tls.certresolver=letsencrypt
-      - traefik.http.services.presigner-service.loadbalancer.server.port=4000
-      - traefik.docker.network=dokploy-network
+      # 🔥 Router PRIORITARIO
+      - traefik.http.routers.000-presigner.rule=Host(`presigner.sparkrise.com.co`)
+      - traefik.http.routers.000-presigner.entrypoints=websecure
+      - traefik.http.routers.000-presigner.tls.certresolver=letsencrypt
 
-      # 🚫 EVITA QUE DOKPLOY GENERE ROUTERS AUTOMÁTICOS
-      - traefik.http.routers.default.rule=Host(`invalid.localhost`)
+      # 🔥 Servidor a enviar tráfico
+      - traefik.http.services.000-presigner-service.loadbalancer.server.port=4000
+
+      #🔥 Red de Traefik
+      - traefik.docker.network=dokploy-network
 
 networks:
   dokploy-network:
