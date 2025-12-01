@@ -17,6 +17,9 @@ services:
     networks:
       - dokploy-network
 
+    ports:
+      - "4000:4000"
+
     labels:
       - traefik.enable=true
       - traefik.http.routers.presigner-router.rule=Host(`presigner.sparkrise.com.co`)
