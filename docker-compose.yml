@@ -3,8 +3,9 @@ version: "3.8"
 services:
   presigner:
     build: .
-    container_name: ${APP_NAME}-presigner
+    container_name: presigner-service
     restart: unless-stopped
+
     environment:
       PORT: 4000
       AWS_REGION: us-east-1
@@ -12,10 +13,16 @@ services:
       S3_BUCKET: resultados
       AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
       AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
-    ports:
-      - "4000"
+
     networks:
       - dokploy-network
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.presigner-router.rule=Host(`presigner.sparkrise.com.co`)
+      - traefik.http.routers.presigner-router.entrypoints=websecure
+      - traefik.http.routers.presigner-router.tls.certresolver=letsencrypt
+      - traefik.http.services.presigner-service.loadbalancer.server.port=4000
 
 networks:
   dokploy-network:
