@@ -3,15 +3,23 @@ version: "3.8"
 services:
   presigner:
     build: .
+    container_name: presigner-service
     restart: unless-stopped
 
     environment:
       PORT: 4000
       AWS_REGION: us-east-1
-      S3_ENDPOINT: http://minio:9000
+
+      # Endpoint PÚBLICO de la API S3 de Minio
+      # (este es el host que recibirán los pacientes en el link)
+      S3_ENDPOINT: https://minio-api.sparkrise.com.co
+
       S3_BUCKET: resultados-laboratorio
-      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
-      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+
+      # Credenciales de Minio (puedes cambiarlas luego por un usuario dedicado)
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: uorbnwuvkrgfct0a
+
       AWS_EC2_METADATA_DISABLED: "true"
 
     networks:
@@ -23,13 +31,10 @@ services:
     labels:
       - traefik.enable=true
 
-      # router principal
-      - traefik.http.routers.presigner.rule=Host(`presigner.sparkrise.com.co`)
-      - traefik.http.routers.presigner.entrypoints=websecure
-      - traefik.http.routers.presigner.tls.certresolver=letsencrypt
-      - traefik.http.routers.presigner.priority=9999
-
-      # servicio
+      # Router HTTPS para el presigner
+      - traefik.http.routers.presigner-secure.rule=Host(`presigner.sparkrise.com.co`)
+      - traefik.http.routers.presigner-secure.entrypoints=websecure
+      - traefik.http.routers.presigner-secure.tls.certresolver=letsencrypt
       - traefik.http.services.presigner.loadbalancer.server.port=4000
 
 networks:
