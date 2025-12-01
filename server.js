@@ -9,19 +9,23 @@ const port = process.env.PORT || 4000;
 const region = process.env.AWS_REGION;
 const bucket = process.env.S3_BUCKET;
 const endpoint = process.env.S3_ENDPOINT;  // ← ESTO FALTABA
-
 const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
 const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 
 // Configurar cliente S3 para MinIO
+const AWS = require('aws-sdk');
 const s3 = new AWS.S3({
-  endpoint: endpoint,                     // ← USAR VARIABLE
-  region: region,
-  accessKeyId: accessKeyId,
-  secretAccessKey: secretAccessKey,
+  endpoint: 'http://minio:9000',
+  region: 'us-east-1',
+  accessKeyId: 'minioadmin',
+  secretAccessKey: 'uorbnwuvkrgfct0a',
   s3ForcePathStyle: true,
   signatureVersion: 'v4',
-  sslEnabled: false                        // MUY IMPORTANTE CON MINIO
+  sslEnabled: false
+});
+
+s3.listBuckets((err, data) => {
+  console.log(err, data);
 });
 
 app.get('/presign', async (req, res) => {
